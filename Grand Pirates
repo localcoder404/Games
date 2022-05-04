@@ -1,0 +1,187 @@
+local Config = {
+    WindowName = "Grand Pirates",
+	Color = Color3.fromRGB(255,128,64),
+	Keybind = Enum.KeyCode.RightBracket
+}
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Roblox/main/BracketV3.lua"))()
+local Window = Library:CreateWindow(Config, game:GetService("CoreGui"))
+
+local Tab1 = Window:CreateTab("Main")
+
+local Section1 = Tab1:CreateSection("Farms")
+local Section2 = Tab1:CreateSection("Misc.")
+
+local Mobs = {}
+for i,v in ipairs(game.Workspace["Non-Player Characters"].Enemies:GetChildren()) do
+    if v:FindFirstChild("HumanoidRootPart") and not table.find(Mobs,v.Name) then
+        table.sort(Mobs)
+        table.insert(Mobs,v.Name)
+        end
+end
+local Quests = {}
+for i,v in ipairs(game.Workspace["Non-Player Characters"].Quests:GetDescendants()) do
+    if v:FindFirstChild("HumanoidRootPart") and not table.find(Quests,v.Name) then
+        table.sort(Quests)
+        table.insert(Quests,v.Name)
+        end
+end
+local Weapons = {}
+for i,v in ipairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+    if v:IsA("Tool") and not table.find(Weapons,v.Name) then
+        table.sort(Weapons)
+        table.insert(Weapons,v.Name)
+        end
+end
+local Islands = {}
+for i,v in ipairs(game.Workspace.IgnoreList.SpawnPoints:GetChildren()) do
+    if not table.find(Islands,v.Name) then
+        table.sort(Islands)
+        table.insert(Islands,v.Name)
+        end
+end
+
+local Shops = {}
+for i,v in ipairs(game.Workspace["Non-Player Characters"].Shops:GetDescendants()) do
+    if v:FindFirstChild("HumanoidRootPart") and not table.find(Shops,v.Name) then
+        table.sort(Shops)
+        table.insert(Shops,v.Name)
+        end
+end
+
+Section1:CreateDropdown("Select a mob",Mobs,function(x)
+   Mober = x
+end)
+
+Section1:CreateDropdown("Select a Quest",Quests,function(x)
+   Quester = x
+end)
+
+Section1:CreateDropdown("Select a Weapon",Weapons,function(x)
+   Weaponpart2 = x
+end)
+Distance = -6
+Section1:CreateSlider("Select a Distance",0,-10,-6,false,function(x)
+   Distance = x
+end)
+
+Section1:CreateToggle("Auto Farm",nil,function(x)
+    Farmer = x 
+    while wait() and Farmer do
+        for i,v in ipairs(game.Workspace["Non-Player Characters"].Enemies:GetChildren()) do
+            if string.find(v.Name,Mober) and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChild("Humanoid") and v.Humanoid.Health ~= 0 then
+                    repeat 
+                        if _G.QuestStart == true then 
+                            wait()
+                            else
+                        task.wait()
+                        pcall(function()
+                            if game.Players.LocalPlayer.Backpack:FindFirstChild(Weaponpart2) then
+                                game.Players.LocalPlayer.Backpack:FindFirstChild(Weaponpart2).Parent = game.Players.LocalPlayer.Character
+                                end
+                            end)
+                    pcall(function()    
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.HumanoidRootPart.Position + Vector3.new(0,Distance,0),v.HumanoidRootPart.Position)
+                    end)
+                    end
+                    until v.Humanoid.Health <= 0 or not Farmer or not v:FindFirstChild("HumanoidRootPart")
+                end
+            end
+        end
+end)
+
+
+Section1:CreateToggle("Chest Farm",nil,function(x)
+    Farmer2 = x 
+    while wait() and Farmer2 do
+        for i,v in ipairs(game.Workspace.IgnoreList.Chests:GetChildren()) do
+                if v.Name == "Chest" and v.Transparency == 0 and v:FindFirstChild("Prompt") then
+                    pcall(function()    
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                    end)
+                    pcall(function()
+                        fireproximityprompt(v.Prompt)
+                        end)
+                    end
+            end
+        end
+end)
+_G.QuestStart = false
+Section1:CreateToggle("Auto Quest",nil,function(x)
+    Questtest = x 
+    while wait(1) and Questtest do
+        if game.Players.LocalPlayer.PlayerGui:FindFirstChild("QUEST") then
+        for i,v in ipairs(game.Players.LocalPlayer.PlayerGui.QUEST:GetChildren()) do
+            if v.Name == "QuestFrame" and v.Visible == false then
+                _G.QuestStart = true
+                wait(0.5)
+            for g,e in ipairs(game.Workspace["Non-Player Characters"].Quests:GetDescendants()) do
+            if e.Name == Quester then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = e.HumanoidRootPart.CFrame
+                end
+            end
+            game:GetService("Players").LocalPlayer.Build.Remotes.ServerRequest:FireServer("SetQuest",Quester)
+            _G.QuestStart = false
+            end
+        end
+    end
+end
+end)
+
+Section2:CreateDropdown("Teleport to a Quest",Quests,function(x)
+    for i,v in ipairs(game.Workspace["Non-Player Characters"].Quests:GetDescendants()) do
+        if v.Name == x and v:FindFirstChild("HumanoidRootPart") then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+            end
+        end
+end)
+
+Section2:CreateDropdown("Teleport to a Island",Islands,function(x)
+    for i,v in ipairs(game.Workspace.IgnoreList.SpawnPoints:GetChildren()) do
+        if v.Name == x then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+            end
+        end
+end)
+
+Section2:CreateDropdown("Teleport to a Shop",Shops,function(x)
+    for i,v in ipairs(game.Workspace["Non-Player Characters"].Shops:GetDescendants()) do
+        if v.Name == x then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+            end
+        end
+end)
+
+Section2:CreateToggle("Auto Buso",nil,function(x)
+    Buso = x 
+    while wait(0.2) and Buso do
+            if not game.Players.LocalPlayer.Character:FindFirstChild("Busoshoku") then
+                    game:GetService("Players").LocalPlayer.Build.Remotes.ServerRequest:FireServer("Busoshoku")
+                end
+            end
+    end)
+
+Section2:CreateToggle("Hide Name(?)",nil,function(x)
+    Hider = x 
+    while wait() and Hider do
+        for i,v in ipairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if v:FindFirstChild("Informations") then
+                v:FindFirstChild("Informations"):Destroy()
+                end
+            end
+        end
+    end)
+
+
+spawn(function()
+    while task.wait() do
+        if Farmer then
+                     pcall(function()    
+                            game:GetService("Players").LocalPlayer.Build.Remotes.ServerCallback:InvokeServer("CombatVariations",Weaponpart2.."Combat")
+                     end)
+                pcall(function()    
+                            game:GetService("Players").LocalPlayer.Character[Weaponpart2]:Activate()
+                    end)
+            end
+        end
+    end)
